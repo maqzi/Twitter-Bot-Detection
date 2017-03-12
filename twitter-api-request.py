@@ -1,8 +1,6 @@
-
-import requests, os, csv, pandas
+import requests, os, pandas
 from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
-
 
 REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
 AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize?oauth_token="
@@ -45,7 +43,6 @@ def setup_oauth():
     credentials = parse_qs(r.content)
     token = credentials.get('oauth_token')[0]
     secret = credentials.get('oauth_token_secret')[0]
-
     return token, secret
 
 
@@ -58,9 +55,14 @@ def get_oauth():
 
 def write_to_csv(responses):
     user_l = []
-    for response in responses.values():
+    for response in responses:
         final_fields = {}
-        response_dict = response.json()[0]
+
+        try:
+            response_dict = response.json()[0]
+        except AttributeError:
+            response_dict = response
+
         for key, value in response_dict.items():
             if key in REQUIRED_FIELDS:
                 final_fields[key] = value
@@ -73,6 +75,10 @@ def write_to_csv(responses):
     user_df.to_csv(twitter_user_data,index=False)
     twitter_user_data.close()
 
+def fix_requests(r):
+    import json
+    return json.loads(r.content.decode('utf-8'))
+
 if __name__ == "__main__":
     if not OAUTH_TOKEN:
         token, secret = setup_oauth()
@@ -80,15 +86,20 @@ if __name__ == "__main__":
         print ("OAUTH_TOKEN_SECRET: " + secret)
     else:
         oauth = get_oauth()
+
+        # for a general search
+        query = 'bot'
+        responses = requests.get(url="https://api.twitter.com/1.1/users/search.json?q="+str(query), auth=oauth)
+        if responses.status_code == 200:
+            fixed_r = fix_requests(responses)
+            write_to_csv(fixed_r)
+'''
+       # for searching using screen name
         screen_name = ['justinbieber','potus']
-        responses = {}
+        responses = []
         for name in screen_name:
-            responses[name] = requests.get(url="https://api.twitter.com/1.1/users/lookup.json?screen_name="+str(name), auth=oauth)
+            response = requests.get(url="https://api.twitter.com/1.1/users/lookup.json?screen_name="+str(name), auth=oauth)
+            if response.status_code == 200:
+                responses.append(response)
         write_to_csv(responses)
-
-#        r = requests.get(url="https://api.twitter.com/1.1/statuses/mentions_timeline.json", auth=oauth)
-#        print (r.json())
-
-
-
-
+'''
