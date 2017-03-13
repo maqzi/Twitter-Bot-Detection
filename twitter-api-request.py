@@ -71,7 +71,7 @@ def write_to_csv(responses):
         user_df = pandas.DataFrame(user_l)
     print(user_df)
 
-    twitter_user_data = open(os.getcwd() + '/twitterUsers.csv', 'w')
+    twitter_user_data = open(os.getcwd() + '/twitterUsers.csv', 'a+')
     user_df.to_csv(twitter_user_data,index=False)
     twitter_user_data.close()
 
@@ -89,10 +89,11 @@ if __name__ == "__main__":
 
         # for a general search
         query = 'bot'
-        responses = requests.get(url="https://api.twitter.com/1.1/users/search.json?q="+str(query), auth=oauth)
-        if responses.status_code == 200:
-            fixed_r = fix_requests(responses)
-            write_to_csv(fixed_r)
+        for page in range(10):
+            responses = requests.get(url="https://api.twitter.com/1.1/users/search.json?q="+str(query)+"&page="+str(page), auth=oauth)
+            if responses.status_code == 200:
+                fixed_r = fix_requests(responses)
+                write_to_csv(fixed_r)
 '''
        # for searching using screen name
         screen_name = ['justinbieber','potus']
