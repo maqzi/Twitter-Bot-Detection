@@ -14,7 +14,7 @@ OAUTH_TOKEN_SECRET = ""
 
 REQUIRED_FIELDS = ['id','id_str','screen_name','location','description','url',
                    'followers_count','friends_count', 'listed_count', 'created_at',
-                   'favorites_count', 'verified','statuses_count','lang','status',
+                   'favourites_count', 'verified','statuses_count','lang','status',
                    'default_profile','default_profile_image','has_extended_profile',
                    'name','bot']
 
@@ -64,6 +64,7 @@ def write_to_csv(responses):
             response_dict = response
 
         for key, value in response_dict.items():
+            print('{} : {}'.format(key,value))
             if key in REQUIRED_FIELDS:
                 final_fields[key] = value
         user_l.append(final_fields)
@@ -87,14 +88,6 @@ if __name__ == "__main__":
     else:
         oauth = get_oauth()
 
-        # for a general search
-        query = 'bot'
-        for page in range(10):
-            responses = requests.get(url="https://api.twitter.com/1.1/users/search.json?q="+str(query)+"&page="+str(page), auth=oauth)
-            if responses.status_code == 200:
-                fixed_r = fix_requests(responses)
-                write_to_csv(fixed_r)
-'''
        # for searching using screen name
         screen_name = ['justinbieber','potus']
         responses = []
@@ -103,4 +96,13 @@ if __name__ == "__main__":
             if response.status_code == 200:
                 responses.append(response)
         write_to_csv(responses)
+
+'''
+        # for a general search
+        query = 'bot'
+        for page in range(1,10):
+            responses = requests.get(url="https://api.twitter.com/1.1/users/search.json?q="+str(query)+"&page="+str(page), auth=oauth)
+            if responses.status_code == 200:
+                fixed_r = fix_requests(responses)
+                write_to_csv(fixed_r)
 '''
