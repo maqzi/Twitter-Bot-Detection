@@ -64,7 +64,6 @@ def write_to_csv(responses):
             response_dict = response
 
         for key, value in response_dict.items():
-            print('{} : {}'.format(key,value))
             if key in REQUIRED_FIELDS:
                 final_fields[key] = value
         user_l.append(final_fields)
@@ -72,7 +71,7 @@ def write_to_csv(responses):
         user_df = pandas.DataFrame(user_l)
     print(user_df)
 
-    twitter_user_data = open(os.getcwd() + '/twitterUsers.csv', 'a+')
+    twitter_user_data = open(os.getcwd() + '/twitterUsers_final.csv', 'w')
     user_df.to_csv(twitter_user_data,index=False)
     twitter_user_data.close()
 
