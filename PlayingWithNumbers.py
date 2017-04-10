@@ -2,36 +2,38 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
 
-print("##### Data Info ##### ")
+print('##### Data Info ##### ')
 
-df_bots = pd.read_csv('bots_data.csv', sep=",", encoding='latin1', na_values='?')
-df_nonbots = pd.read_csv('nonbots_data.csv', sep=",", encoding='latin1', na_values='?')
+df_bots = pd.read_csv('bots_data.csv', sep=",", encoding='latin1')
+df_nonbots = pd.read_csv('nonbots_data.csv', sep=",", encoding='latin1')
 # print(df_bots.head(5))
 
 df = pd.concat([df_bots, df_nonbots], ignore_index=True)
+df.fillna('?', inplace=True)
 print('total: {}'.format(df.shape))
+
+# add a column 'nb_guess' with a Naive Bayes classification of the description
+df['nb_guess'] = pd.read_csv('nb_guess.csv', header=None)
 
 # removing unnecessary columns. keeping only numbers for this part
 df = df.drop(['id', 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location',
               'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name'], 1)
 print(df.columns)
 
-shuffled_df = df.reindex(np.random.permutation(df.index))
+# split the dataset into 80/20
+split = np.random.rand(len(df)) < 0.8
+train_df = df[split]
+test_df = df[~split]
 
-# split the shuffled data into 80/20
-train_split = 0.8
-train_df = shuffled_df[:int(np.floor(shuffled_df.shape[0] * train_split))]
-test_df = shuffled_df[int(np.floor(shuffled_df.shape[0] * train_split)):]
-
-print("train: {}, test: {}".format(train_df.shape, test_df.shape))
+print('train: {}, test: {}'.format(train_df.shape, test_df.shape))
 
 ## Random Forests
-print("\n##### Random Forests #####")
+print('\n##### Random Forests #####')
 X = train_df.drop('bot', 1)
 Y = train_df['bot']
 from sklearn.ensemble import RandomForestClassifier
 
-clf_RF = RandomForestClassifier(criterion="entropy")
+clf_RF = RandomForestClassifier(criterion='entropy')
 clf_RF.fit(X, Y)
 print('accuracy on training data: {}'.format(clf_RF.score(X, Y)))
 print('accuracy on test data: {}'.format(clf_RF.score(test_df.drop('bot', 1), test_df['bot'])))
@@ -39,7 +41,7 @@ print()
 
 ## Decision Tree
 # create the classifier
-print("\n##### Decision Trees #####")
+print('\n##### Decision Trees #####')
 from sklearn.tree import DecisionTreeClassifier
 
 clf_dt = DecisionTreeClassifier(criterion='entropy')
@@ -59,7 +61,7 @@ print()
 ## Linear Regression doesnt make sense because well, either bot or not.
 
 ## Logistic Regression
-print("\n##### Logistic Regression #####")
+print('\n##### Logistic Regression #####')
 from sklearn.linear_model import LogisticRegression
 
 X = train_df.drop('bot', 1)
@@ -73,14 +75,14 @@ for i, C in enumerate((100, 1, 0.01)):
     clf_l1_LR.fit(X, y)
     clf_l2_LR.fit(X, y)
 
-    print("C=%.2f" % C)
-    print("- Training Data:")
-    print("score with L1 penalty: %.4f" % clf_l1_LR.score(X, y))
-    print("score with L2 penalty: %.4f" % clf_l2_LR.score(X, y))
+    print('C=%.2f' % C)
+    print('- Training Data:')
+    print('score with L1 penalty: %.4f' % clf_l1_LR.score(X, y))
+    print('score with L2 penalty: %.4f' % clf_l2_LR.score(X, y))
 
-    print("- Test Data:")
-    print("score with L1 penalty: %.4f" % clf_l1_LR.score(test_df.drop('bot', 1), test_df['bot']))
-    print("score with L2 penalty: %.4f" % clf_l2_LR.score(test_df.drop('bot', 1), test_df['bot']))
+    print('- Test Data:')
+    print('score with L1 penalty: %.4f' % clf_l1_LR.score(test_df.drop('bot', 1), test_df['bot']))
+    print('score with L2 penalty: %.4f' % clf_l2_LR.score(test_df.drop('bot', 1), test_df['bot']))
 
     print()
 
@@ -96,9 +98,9 @@ clf_MNB = MultinomialNB()
 clf_BNB.fit(X, Y)
 clf_MNB = clf_MNB.fit(X, Y)
 
-print("\n##### Naive Bayes #####")
-print("Bernoulli NB score on training data: {}".format(clf_BNB.score(X, Y)))
-print("Multinomial NB score on training data: {}".format(clf_MNB.score(X, Y)))
-print("Bernoulli NB score on test data: {}".format(clf_BNB.score(test_df.drop('bot', 1), test_df['bot'])))
-print("Multinomial NB score on test data: {}".format(clf_MNB.score(test_df.drop('bot', 1), test_df['bot'])))
+print('\n##### Naive Bayes #####')
+print('Bernoulli NB score on training data: {}'.format(clf_BNB.score(X, Y)))
+print('Multinomial NB score on training data: {}'.format(clf_MNB.score(X, Y)))
+print('Bernoulli NB score on test data: {}'.format(clf_BNB.score(test_df.drop('bot', 1), test_df['bot'])))
+print('Multinomial NB score on test data: {}'.format(clf_MNB.score(test_df.drop('bot', 1), test_df['bot'])))
 print()
