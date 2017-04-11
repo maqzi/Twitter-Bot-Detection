@@ -98,9 +98,94 @@ clf_MNB = MultinomialNB()
 clf_BNB.fit(X, Y)
 clf_MNB = clf_MNB.fit(X, Y)
 
+clf_BNB_score_train = clf_BNB.score(X, Y)
+clf_MNB_score_train = clf_MNB.score(X, Y)
+clf_BNB_score_test = clf_BNB.score(test_df.drop('bot', 1), test_df['bot'])
+clf_MNB_score_test = clf_MNB.score(test_df.drop('bot', 1), test_df['bot'])
+
 print('\n##### Naive Bayes #####')
-print('Bernoulli NB score on training data: {}'.format(clf_BNB.score(X, Y)))
-print('Multinomial NB score on training data: {}'.format(clf_MNB.score(X, Y)))
-print('Bernoulli NB score on test data: {}'.format(clf_BNB.score(test_df.drop('bot', 1), test_df['bot'])))
-print('Multinomial NB score on test data: {}'.format(clf_MNB.score(test_df.drop('bot', 1), test_df['bot'])))
+print('Bernoulli NB score on training data: {}'.format(clf_BNB_score_train))
+print('Multinomial NB score on training data: {}'.format(clf_MNB_score_train))
+print('Bernoulli NB score on test data: {}'.format(clf_BNB_score_test))
+print('Multinomial NB score on test data: {}'.format(clf_MNB_score_test))
 print()
+
+from sklearn import metrics
+import matplotlib.pyplot as plt
+
+for j, C in enumerate((100, 1, 0.01)):
+    # turn down tolerance for short training time
+    clf_l1_LR = LogisticRegression(C=C, penalty='l1', tol=0.01)
+    clf_l2_LR = LogisticRegression(C=C, penalty='l2', tol=0.01)
+    clf_l1_LR.fit(X, y)
+    clf_l2_LR.fit(X, y)
+
+    print('C=%.2f' % C)
+    print('- Training Data:')
+    print('score with L1 penalty: %.4f' % clf_l1_LR.score(X, y))
+    print('score with L2 penalty: %.4f' % clf_l2_LR.score(X, y))
+
+    print('- Test Data:')
+    print('score with L1 penalty: %.4f' % clf_l1_LR.score(test_df.drop('bot', 1), test_df['bot']))
+    print('score with L2 penalty: %.4f' % clf_l2_LR.score(test_df.drop('bot', 1), test_df['bot']))
+
+    print()
+
+fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'], clf_MNB.predict(test_df.drop('bot', 1)))
+fpr_bnb, tpr_bnb, _ = metrics.roc_curve(test_df['bot'], clf_BNB.predict(test_df.drop('bot', 1)))
+fpr_dt, tpr_dt, _ = metrics.roc_curve(test_df['bot'], clf_dt.predict(test_df.drop('bot', 1)))
+fpr_RF, tpr_RF, _ = metrics.roc_curve(test_df['bot'], clf_RF.predict(test_df.drop('bot', 1)))
+# fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'],clf_MNB.predict(test_df.drop('bot', 1)))
+# fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'],clf_MNB.predict(test_df.drop('bot', 1)))
+
+plt.figure(1)
+plt.plot(fpr_mnb, tpr_mnb, label='MNB')
+plt.plot(fpr_bnb, tpr_bnb, label='BNB')
+plt.plot(fpr_dt, tpr_dt, label='DT')
+plt.plot(fpr_RF, tpr_RF, label='RF')
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.title('ROC curve')
+plt.legend(loc='best')
+plt.show()
+
+########################################################################
+C = 100
+clf_l1_LR = LogisticRegression(C=C, penalty='l1', tol=0.01)
+clf_l2_LR = LogisticRegression(C=C, penalty='l2', tol=0.01)
+clf_l1_LR.fit(X, y)
+clf_l2_LR.fit(X, y)
+
+fpr_clfL1_100, tpr_clfL1_100, _ = metrics.roc_curve(test_df['bot'], clf_l1_LR.predict(test_df.drop('bot', 1)))
+fpr_clfL2_100, tpr_clfL2_100, _ = metrics.roc_curve(test_df['bot'], clf_l2_LR.predict(test_df.drop('bot', 1)))
+
+C = 1
+clf_l1_LR = LogisticRegression(C=C, penalty='l1', tol=0.01)
+clf_l2_LR = LogisticRegression(C=C, penalty='l2', tol=0.01)
+clf_l1_LR.fit(X, y)
+clf_l2_LR.fit(X, y)
+
+fpr_clfL1_1, tpr_clfL1_1, _ = metrics.roc_curve(test_df['bot'], clf_l1_LR.predict(test_df.drop('bot', 1)))
+fpr_clfL2_1, tpr_clfL2_1, _ = metrics.roc_curve(test_df['bot'], clf_l2_LR.predict(test_df.drop('bot', 1)))
+
+C = 0.01
+clf_l1_LR = LogisticRegression(C=C, penalty='l1', tol=0.01)
+clf_l2_LR = LogisticRegression(C=C, penalty='l2', tol=0.01)
+clf_l1_LR.fit(X, y)
+clf_l2_LR.fit(X, y)
+
+fpr_clfL1_d1, tpr_clfL1_d1, _ = metrics.roc_curve(test_df['bot'], clf_l1_LR.predict(test_df.drop('bot', 1)))
+fpr_clfL2_d1, tpr_clfL2_d1, _ = metrics.roc_curve(test_df['bot'], clf_l2_LR.predict(test_df.drop('bot', 1)))
+
+plt.figure(1)
+plt.plot(fpr_clfL1_100, tpr_clfL1_100, label='L1 - W:100')
+plt.plot(fpr_clfL2_100, tpr_clfL2_100, label='L2 - W:100')
+plt.plot(fpr_clfL1_1, tpr_clfL1_1, label='L1 - W:1')
+plt.plot(fpr_clfL2_1, tpr_clfL2_1, label='L2 - W:1')
+plt.plot(fpr_clfL1_d1, tpr_clfL1_d1, label='L1 - W:.01')
+plt.plot(fpr_clfL2_d1, tpr_clfL2_d1, label='L2 - W:.01')
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.title('ROC curve for Logistic Regression')
+plt.legend(loc='best')
+plt.show()
