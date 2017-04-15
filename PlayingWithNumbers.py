@@ -15,6 +15,9 @@ print('total: {}'.format(df.shape))
 # add a column 'nb_guess' with a Naive Bayes classification of the description
 df['nb_guess'] = pd.read_csv('nb_guess.csv', header=None)
 
+# add a column 'svm_guess' with a SVM classification of the description
+df['svm_guess'] = pd.read_csv('svm_guess.csv', header=None)
+
 # removing unnecessary columns. keeping only numbers for this part
 df = df.drop(['id', 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location',
               'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name'], 1)
@@ -135,8 +138,6 @@ fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'], clf_MNB.predict(test_df.
 fpr_bnb, tpr_bnb, _ = metrics.roc_curve(test_df['bot'], clf_BNB.predict(test_df.drop('bot', 1)))
 fpr_dt, tpr_dt, _ = metrics.roc_curve(test_df['bot'], clf_dt.predict(test_df.drop('bot', 1)))
 fpr_RF, tpr_RF, _ = metrics.roc_curve(test_df['bot'], clf_RF.predict(test_df.drop('bot', 1)))
-# fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'],clf_MNB.predict(test_df.drop('bot', 1)))
-# fpr_mnb, tpr_mnb, _ = metrics.roc_curve(test_df['bot'],clf_MNB.predict(test_df.drop('bot', 1)))
 
 plt.figure(1)
 plt.plot(fpr_mnb, tpr_mnb, label='MNB')
