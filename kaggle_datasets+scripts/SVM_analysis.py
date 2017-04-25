@@ -7,15 +7,17 @@ from sklearn import metrics
 import pickle
 
 # Load all accounts into one dataframe
-bots = pd.read_csv('bots_data.csv', encoding='latin1')
-nonbots = pd.read_csv('nonbots_data.csv', encoding='latin1')
-users = pd.concat([bots, nonbots], ignore_index=True)[['description', 'bot']]
-users.fillna('', inplace=True)
+# bots = pd.read_csv('bots_data.csv', encoding='latin1')
+# nonbots = pd.read_csv('nonbots_data.csv', encoding='latin1')
+# users = pd.concat([bots, nonbots], ignore_index=True)[['description', 'bot']]
+users_train = pd.read_csv('training_data.csv', encoding='latin1')[['description', 'bot']]
+users_train.fillna('', inplace=True)
 
 # Split into training and test sets (80/20)
-split = np.random.rand(len(users)) < 0.8
-users_train = users[split]
-users_test = users[~split]
+# split = np.random.rand(len(users)) < 0.8
+# users_train = users[split]
+# users_test = users[~split]
+
 
 # calculate the BOW representation
 vectorizer = CountVectorizer(min_df=1)
