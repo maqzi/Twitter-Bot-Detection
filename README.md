@@ -11,5 +11,7 @@ Finalized. Uploaded in Repo.
 
 ### Process
 descriptions -> preprocessed+normalized -> naivebayes guesswork 
+
 descriptions -> preprocessed(implement normalization) -> svm guesswork 
+
 naivebayes guesswork + svm guesswork + important numerical features -> [LogR / RF / DT / MNB / BNB] (CrossValidated+GridSearchedForAnOptimizedModel) -> prediction
