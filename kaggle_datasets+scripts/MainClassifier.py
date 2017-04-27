@@ -4,12 +4,9 @@ from sklearn.metrics import accuracy_score
 
 print('##### Data Info ##### ')
 
-df_bots = pd.read_csv('bots_data.csv', sep=",", encoding='latin1')
-df_nonbots = pd.read_csv('nonbots_data.csv', sep=",", encoding='latin1')
-# print(df_bots.head(5))
-
-df = pd.concat([df_bots, df_nonbots], ignore_index=True)
-df.fillna('?', inplace=True)
+# df = pd.concat([df_bots, df_nonbots], ignore_index=True)
+df = pd.read_csv('training_data.csv', sep=",", encoding='latin1')
+df.fillna('', inplace=True)
 print('total: {}'.format(df.shape))
 
 # add a column 'nb_guess' with a Naive Bayes classification of the description
@@ -175,8 +172,8 @@ clf_l2_LR = LogisticRegression(C=C, penalty='l2', tol=0.01)
 clf_l1_LR.fit(X, y)
 clf_l2_LR.fit(X, y)
 
-fpr_clfL1_d1, tpr_clfL1_d1, _ = metrics.roc_curve(test_df['bot'], clf_l1_LR.predict(test_df.drop('bot', 1)))
-fpr_clfL2_d1, tpr_clfL2_d1, _ = metrics.roc_curve(test_df['bot'], clf_l2_LR.predict(test_df.drop('bot', 1)))
+fpr_clfL1_d1, tpr_clfL1_d1, _ = metrics.roc_curve(test_df['bot'], clf_l1_LR.predict_proba(test_df.drop('bot', 1))[:1])
+fpr_clfL2_d1, tpr_clfL2_d1, _ = metrics.roc_curve(test_df['bot'], clf_l2_LR.predict_proba(test_df.drop('bot', 1))[:1])
 
 plt.figure(1)
 plt.plot(fpr_clfL1_100, tpr_clfL1_100, label='L1 - W:100')

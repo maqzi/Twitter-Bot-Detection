@@ -3,25 +3,23 @@ from sklearn.svm import SVC
 import numpy as np
 import sklearn
 from sklearn.feature_extraction.text import CountVectorizer
+from text_normalize import normalize
 from sklearn import metrics
 import pickle
 
 # Load all accounts into one dataframe
-# bots = pd.read_csv('bots_data.csv', encoding='latin1')
-# nonbots = pd.read_csv('nonbots_data.csv', encoding='latin1')
-# users = pd.concat([bots, nonbots], ignore_index=True)[['description', 'bot']]
-users_train = pd.read_csv('training_data.csv', encoding='latin1')[['description', 'bot']]
-users_train.fillna('', inplace=True)
+users = pd.read_csv('training_data.csv', encoding='latin1')[['description', 'bot']]
+users.fillna('', inplace=True)
 
 # Split into training and test sets (80/20)
-# split = np.random.rand(len(users)) < 0.8
-# users_train = users[split]
-# users_test = users[~split]
+split = np.random.rand(len(users)) < 0.8
+users_train = users[split]
+users_test = users[~split]
 
 
 # calculate the BOW representation
 vectorizer = CountVectorizer(min_df=1)
-word_counts = vectorizer.fit_transform(users_train['description'])
+word_counts = vectorizer.fit_transform((users_train['description']))
 
 # TFIDF
 tf_transformer = sklearn.feature_extraction.text.TfidfTransformer(use_idf=True).fit(word_counts)
@@ -34,7 +32,7 @@ clf = sklearn.svm.LinearSVC()
 clf.fit(X_train, y_train)
 
 # working on the test set
-test_word_count = vectorizer.transform(users_test['description'])
+test_word_count = vectorizer.transform((users_test['description']))
 X_test = tf_transformer.transform(test_word_count)
 # X_test = test_word_count #UNCOMMENT FOR BOW (BAG OF WORDS)
 y_predicted = clf.predict(X_test)
@@ -50,5 +48,6 @@ f.close()
 
 # Classify all descriptions and write class values to file
 print(users.shape)
-pd.DataFrame(clf.predict(tf_transformer.transform(vectorizer.transform(desc for desc in users['description'])))).to_csv(
+pd.DataFrame(
+    clf.predict(tf_transformer.transform(vectorizer.transform((desc) for desc in users['description'])))).to_csv(
     'svm_guess.csv', index=False, header=False)
