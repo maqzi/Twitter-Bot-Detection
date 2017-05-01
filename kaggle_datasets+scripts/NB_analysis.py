@@ -30,5 +30,4 @@ users.fillna('', inplace=True)
 loaded_nbcl = pickle.load(open('nbcl.pickle', 'rb'))
 
 # Classify all descriptions and write class values to file
-pd.DataFrame(loaded_nbcl.classify(normalize(desc)) for desc in users['description']).to_csv('nb_guess.csv', index=False,
-                                                                                            header=False)
+pd.DataFrame(loaded_nbcl.classify(normalize(desc)) for desc in users['description']).to_csv('nb_guess.csv', index=False, header=False)

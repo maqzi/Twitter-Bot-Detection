@@ -71,9 +71,11 @@ testdata['nb_guess'] = pd.read_csv('nb_test_guess.csv', header=None)
 # add a column 'svm_guess' with a SVM classification of the description
 testdata['svm_guess'] = pd.read_csv('svm_test_guess.csv', header=None)
 
+# save ids for final results file
+test_ids = testdata[testdata.axes[1][0]].astype('int64')
+
 # removing unnecessary columns. keeping only numbers for this part
-testdata = testdata.drop(['id', 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location',
-              'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name','bot'], 1)
+testdata = testdata.drop([testdata.axes[1][0], 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location', 'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name','bot'], 1)
 
 for c in testdata.columns:
     if(testdata[c].dtype==object):
@@ -102,8 +104,7 @@ traindata['nb_guess'] = pd.read_csv('nb_guess.csv', header=None)
 # add a column 'svm_guess' with a SVM classification of the description
 traindata['svm_guess'] = pd.read_csv('svm_guess.csv', header=None)
 
-traindata = traindata.drop(['id', 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location',
-              'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name'], 1)
+traindata = traindata.drop([traindata.axes[1][0], 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location', 'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name'], 1)
 
 X_train = traindata.drop('bot',1)
 y_train = traindata['bot']
@@ -120,8 +121,7 @@ grid_result = grid_search.fit(X_train, y_train)
 bScores = cross_val_score(grid_result.best_estimator_, X_train, y_train, cv=10)
 print("cross val accuracy for row sampling:",np.mean(bScores))
 
-testdata.columns = ['followers_count', 'friends_count', 'listedcount', 'favourites_count',
-       'verified', 'statuses_count', 'nb_guess', 'svm_guess']
+testdata.columns = ['followers_count', 'friends_count', 'listedcount', 'favourites_count', 'verified', 'statuses_count', 'nb_guess', 'svm_guess']
 
 print("test:",testdata.columns)
 print("train:",traindata.columns)
@@ -129,9 +129,12 @@ print("train:",traindata.columns)
 y_predicted = grid_result.predict(testdata)
 print(y_predicted.dtype)
 
-answer = pd.DataFrame(y_predicted.astype(int),testdata.index.values.astype(int)+1,['Bot'],dtype=int)
+#answer = pd.DataFrame({'id' : test_ids, 'bot' : y_predicted})
+answer = pd.concat([test_ids, pd.Series(y_predicted)], axis=1)
+answer.columns = ['id', 'bot']
 print(answer.dtypes,'\n')
-answer.to_csv('results_file.csv',index=True,index_label='Id')
+answer.to_csv('results_file.csv', index=False)
+# answer.to_csv('results_file.csv',index=True,index_label='Id')
 
 # summarize results
 print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
