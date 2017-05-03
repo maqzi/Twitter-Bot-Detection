@@ -7,7 +7,7 @@ Identifying bots on twitter using various Machine Learning algorithms.
 Finalized. Uploaded in Repo.
 
 ### Wordcloud of User Descriptions
-![Descriptions Visualized](https://github.com/maqzi/Twitter-Bot-Detection/blob/master/wordcloud_white.png?raw=true)
+![Descriptions Visualized](https://github.com/maqzi/Twitter-Bot-Detection/blob/master/Figures/wordcloud_white.png?raw=true)
 
 ### Process
 descriptions -> preprocessed+normalized -> naivebayes guesswork 
