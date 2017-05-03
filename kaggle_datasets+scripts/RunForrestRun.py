@@ -22,6 +22,9 @@ Other things to consider:
     friends/followers ratio,
     adaboost, <- implemented below
     preprocess svm descriptions
+    use random forests only - without boosting
+    use svm without nb
+    look for 'bot' in name
 '''
 
 # removing unnecessary columns. keeping only numbers for this part

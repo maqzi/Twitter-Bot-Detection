@@ -19,6 +19,7 @@ data['nb_guess'] = pd.read_csv('nb_guess.csv', header=None)
 # add a column 'svm_guess' with a SVM classification of the description
 data['svm_guess'] = pd.read_csv('svm_guess.csv', header=None)
 
+
 data = data.drop(['id', 'id_str', 'url', 'default_profile', 'default_profile_image', 'screen_name', 'location',
               'has_extended_profile', 'status', 'lang', 'description', 'created_at', 'name'], 1)
 print(data.columns)
